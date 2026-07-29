@@ -1,0 +1,15 @@
+Topic: Virtual Environment (venv)
+
+What is venv?
+
+A virtual environment (venv) is an isolated Python environment for a specific project.
+
+Why did we use it?
+
+Keeps project dependencies separate from other projects.
+Prevents package version conflicts.
+Makes the project easy to share and reproduce.
+
+Interview Answer (30 seconds)
+
+"I used a virtual environment to isolate the project's dependencies. This ensures that all required Python packages are installed only for this project, avoids conflicts with other projects, and allows anyone to recreate the same environment using the requirements.txt file."
