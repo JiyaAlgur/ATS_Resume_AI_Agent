@@ -2,18 +2,7 @@ from agents.gemini_extracted_keyword import GeminiKeywordExtractor
 
 jd = """
 Working knowledge of data pipeline development using PySpark, Apache Spark, Airflow, dbt, Dagster, or equivalent technologies.
- Experience working with structured data from databases, APIs, enterprise applications, data lakes, warehouses, or lakehouse platforms.
- Exposure to cloud data platforms such as Databricks, Snowflake, BigQuery, Azure Data Lake, AWS S3, Google Cloud Storage, or equivalent platforms.
- Understanding of data modelling, schema design, joins, keys, relationships, data validation, and data quality concepts.
- Practical experience with data profiling, cleansing, transformation, and reconciliation.
- Familiarity with Git, CI/CD basics, unit testing, and production-grade engineering practices.
- Build and maintain data ingestion pipelines for structured enterprise systems such as ERP, CRM, billing, finance, HR, OSS/BSS, ServiceNow, Salesforce, SAP, Oracle, databases, and APIs.
- Build pipelines for unstructured and semi-structured data sources such as documents, emails, logs, transcripts, PDFs, spreadsheets, and media metadata.
- Develop ETL/ELT workflows using Python, SQL, PySpark, Apache Spark, Airflow, dbt, Dagster, cloud-native services, or equivalent technologies.
- Support data profiling routines to identify missing values, duplicates, inconsistent formats, incomplete master data, schema changes, and conflicting records.
- Implement data quality checks using frameworks such as Great Expectations, dbt tests, AWS Glue DataBrew, custom validation scripts, or equivalent tools.
- Support data labelling, contextualization, harmonization, enrichment, and classification workflows required for AI agent configuration.
-aaaPrepare data outputs for downstream AI consumption, including embeddings, metadata, semantic tags, graph-ready datasets, and retrieval-ready document chunks.
+ Experience 
 """
 
 extractor = GeminiKeywordExtractor()
