@@ -1,10 +1,17 @@
+from agents.skill_normalizer import SkillNormalizer
+
+
 class ATSMatcher:
+
+    def __init__(self):
+
+        self.normalizer = SkillNormalizer()
 
     def compare(self, resume_data, jd_data):
 
-        # Resume Technologies
-        resume_items = set()
+        resume_items = {}
 
+        # Collect Resume Technologies
         for category in [
             "skills",
             "tools",
@@ -14,11 +21,14 @@ class ATSMatcher:
         ]:
 
             for item in resume_data.get(category, []):
-                resume_items.add(item.lower().strip())
 
-        # JD Technologies
-        jd_items = set()
+                normalized = self.normalizer.normalize(item)
 
+                resume_items[normalized] = item
+
+        jd_items = {}
+
+        # Collect JD Technologies
         for category in [
             "skills",
             "tools",
@@ -28,22 +38,36 @@ class ATSMatcher:
         ]:
 
             for item in jd_data.get(category, []):
-                jd_items.add(item.lower().strip())
 
-        matched = sorted(resume_items & jd_items)
+                normalized = self.normalizer.normalize(item)
 
-        missing = sorted(jd_items - resume_items)
+                jd_items[normalized] = item
 
-        extra = sorted(resume_items - jd_items)
+        matched = []
+        missing = []
 
-        score = 0
+        for normalized_skill, original_skill in jd_items.items():
+
+            if normalized_skill in resume_items:
+                matched.append(original_skill)
+            else:
+                missing.append(original_skill)
+
+        extra = []
+
+        for normalized_skill, original_skill in resume_items.items():
+
+            if normalized_skill not in jd_items:
+                extra.append(original_skill)
 
         if len(jd_items) > 0:
             score = round((len(matched) / len(jd_items)) * 100)
+        else:
+            score = 0
 
         return {
-            "matched": matched,
-            "missing": missing,
-            "extra": extra,
+            "matched": sorted(matched),
+            "missing": sorted(missing),
+            "extra": sorted(extra),
             "score": score
         }
