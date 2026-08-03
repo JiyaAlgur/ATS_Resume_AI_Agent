@@ -1,8 +1,8 @@
 class JDReader:
 
-    def __init__(self, jd_text):
-        self.jd_text = jd_text
+    def __init__(self, file_path):
+        self.file_path = file_path
 
     def read_jd(self):
-
-        return self.jd_text.strip()
+        with open(self.file_path, "r", encoding="utf-8") as file:
+            return file.read().strip()
