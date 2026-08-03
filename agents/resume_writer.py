@@ -42,7 +42,7 @@ class ResumeWriter:
 
                 paragraph.text = ""
 
-        skills_text = "\n".join(new_skills)
+        skills_text = ", ".join(new_skills)
 
         for i, paragraph in enumerate(self.document.paragraphs):
 
