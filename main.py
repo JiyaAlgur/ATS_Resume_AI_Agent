@@ -2,10 +2,15 @@ from agents.resume_reader import ResumeReader
 from agents.gemini_resume_extractor import GeminiResumeExtractor
 from agents.gemini_extracted_keyword import GeminiKeywordExtractor
 from agents.ats_matcher import ATSMatcher
+from agents.resume_optimizer import ResumeOptimizer
+from agents.resume_writer import ResumeWriter
+from agents.resume_validator import ResumeValidator
+from agents.report_generator import ReportGenerator
+from agents.jd_reader import JDReader
 
 
 
-#READ RESUME
+# READ RESUME
 
 
 print("Reading Resume...")
@@ -17,7 +22,7 @@ print("✅ Resume Read Successfully")
 
 
 
-#ANALYZE RESUME USING GEMINI
+# ANALYZE RESUME
 
 
 print("\nAnalyzing Resume...")
@@ -29,45 +34,59 @@ print("✅ Resume Analysis Completed")
 
 
 
-#JOB DESCRIPTION
+# VALIDATE RESUME
 
 
-jd = """
-Qualifications
+print("\nValidating Resume...")
 
-A bachelor’s degree in Computer Science or related field with 6-12 years of technology experience
+validator = ResumeValidator()
 
-Strong experience in System Integration, Application Development or Data-Warehouse projects, across technologies used in the enterprise space
+validation_report = validator.validate(resume_data)
 
-Software development experience using: Object-oriented languages (e.g. Python, PySpark,) and frameworks
+print("✅ Resume Validation Completed")
 
-Database programming using any flavors of SQL
+print("\n" + "=" * 60)
+print("             RESUME VALIDATION REPORT")
+print("=" * 60)
 
-Expertise in relational and dimensional modelling, including big data technologies
+for section, status in validation_report.items():
 
-Exposure across all the SDLC process, including testing and deployment
+    if section == "Overall Status":
+        continue
 
-Expertise in Microsoft Azure is mandatory including components like Azure Data Factory, Azure Data Lake Storage, Azure SQL, Azure Databricks, HD Insights, ML Service etc.
+    icon = "✓" if status else "✗"
 
-Good knowledge of Python and Spark are required
+    print(f"{icon} {section}")
 
-Good understanding of how to enable analytics using cloud technology and ML Ops
+print("\nOverall Status:")
 
-Experience in Azure Infrastructure and Azure Dev Ops will be a strong plus
+if validation_report["Overall Status"]:
+    print("✓ Resume Structure Valid")
+else:
+    print("✗ Resume Structure Incomplete")
 
-Proven track record in keeping existing technical skills and developing new ones
-
-Characteristics of a forward thinker and self-starter
-
-Ability to work with a global team of consulting professionals across multiple projects
-
-Passion for educating, training, designing, and building end-to-end systems
-
-GenAI - added advantage
-"""
+print("=" * 60)
 
 
-#ANALYZE JOB DESCRIPTION
+
+
+
+# READ JOB DESCRIPTION
+
+
+print("\nReading Job Description...")
+
+jd_reader = JDReader(
+    "uploads/job_descriptions/sample_jd.txt"
+)
+
+jd = jd_reader.read_jd()
+
+print("✅ Job Description Read Successfully")
+
+
+
+# ANALYZE JOB DESCRIPTION
 
 
 print("\nAnalyzing Job Description...")
@@ -79,14 +98,14 @@ print("✅ Job Description Analysis Completed")
 
 
 
-#ATS MATCHING
+# ATS MATCHING
 
 
 print("\nComparing Resume with Job Description...")
 
 matcher = ATSMatcher()
 
-result = matcher.compare(
+ats_report = matcher.compare(
     resume_data,
     jd_data
 )
@@ -95,34 +114,95 @@ print("✅ ATS Comparison Completed")
 
 
 
-#DISPLAY REPORT
+# RESUME OPTIMIZATION
+
+
+print("\nOptimizing Resume...")
+
+optimizer = ResumeOptimizer()
+
+optimized_resume = optimizer.optimize(
+    resume_data,
+    jd_data,
+    ats_report
+)
+
+print("✅ Resume Optimized")
+
+
+
+# WRITE OPTIMIZED RESUME
+
+
+print("\nGenerating Optimized Resume...")
+
+writer = ResumeWriter("uploads/resumes/sample_resume.docx")
+
+writer.update_summary(
+    optimized_resume["summary"]
+)
+
+writer.update_skills(
+    optimized_resume["skills"]
+)
+
+writer.save("outputs/optimized_resume.docx")
+
+print("✅ Optimized Resume Generated")
+
+
+
+# GENERATE ATS REPORT FILE
+
+
+print("\nGenerating ATS Report...")
+
+report = ReportGenerator()
+
+report.generate(
+    validation_report,
+    ats_report,
+    "outputs/ATS_Report.txt"
+)
+
+print("✅ ATS Report Generated")
+
+
+
+# DISPLAY ATS REPORT
+
 
 print("\n")
 print("=" * 60)
 print("                 ATS MATCH REPORT")
 print("=" * 60)
 
-print(f"\nATS Score : {result['score']}%")
+print(f"\nATS Score : {ats_report['score']}%")
 
 print("\nMatched Skills")
 print("-" * 30)
 
-for skill in result["matched"]:
+for skill in ats_report["matched"]:
     print(f"✓ {skill}")
 
 print("\nMissing Skills")
 print("-" * 30)
 
-for skill in result["missing"]:
+for skill in ats_report["missing"]:
     print(f"✗ {skill}")
 
 print("\nAdditional Skills Found in Resume")
 print("-" * 30)
 
-for skill in result["extra"]:
+for skill in ats_report["extra"]:
     print(f"• {skill}")
+
 
 print("\n")
 print("=" * 60)
-print("           ANALYSIS COMPLETED SUCCESSFULLY")
+print("      RESUME OPTIMIZATION COMPLETED")
 print("=" * 60)
+
+print("\nFiles Generated Successfully")
+print("✓ outputs/optimized_resume.docx")
+print("✓ outputs/ATS_Report.txt")
