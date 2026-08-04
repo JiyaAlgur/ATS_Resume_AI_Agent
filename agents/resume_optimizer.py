@@ -1,14 +1,13 @@
 import json
-import time
-from google import genai
 
-from config import GEMINI_API_KEY
+from agents.gemini_client import GeminiClient
+from agents.exceptions import InvalidJSONError
 
 
 class ResumeOptimizer:
 
     def __init__(self):
-        self.client = genai.Client(api_key=GEMINI_API_KEY)
+        self.client = GeminiClient()
 
     def optimize(self, resume_data, jd_data, ats_report):
 
@@ -56,45 +55,23 @@ ATS Report:
 {json.dumps(ats_report, indent=2)}
 """
 
-        max_retries = 3
+        text = self.client.generate(prompt).strip()
 
-        for attempt in range(max_retries):
+        if text.startswith("```json"):
+            text = text.replace("```json", "", 1)
 
-            try:
+        if text.startswith("```"):
+            text = text.replace("```", "", 1)
 
-                response = self.client.models.generate_content(
-                    model="gemini-flash-latest",
-                    contents=prompt
-                )
+        if text.endswith("```"):
+            text = text[:-3]
 
-                text = response.text.strip()
+        text = text.strip()
 
-                if text.startswith("```json"):
-                    text = text.replace("```json", "", 1)
+        try:
+            return json.loads(text)
 
-                if text.startswith("```"):
-                    text = text.replace("```", "", 1)
-
-                if text.endswith("```"):
-                    text = text[:-3]
-
-                text = text.strip()
-
-                return json.loads(text)
-
-            except Exception as e:
-
-                print(f"\n⚠ Gemini API Error (Attempt {attempt + 1}/{max_retries})")
-                print(e)
-
-                if attempt < max_retries - 1:
-                    print("Retrying in 5 seconds...\n")
-                    time.sleep(5)
-                else:
-                    print("\n❌ Unable to optimize resume.")
-                    print("Returning original summary and skills.\n")
-
-                    return {
-                        "summary": resume_data["summary"],
-                        "skills": resume_data["skills"]
-                    }
+        except json.JSONDecodeError:
+            raise InvalidJSONError(
+                "Gemini returned invalid JSON while optimizing the resume."
+            )

@@ -1,12 +1,13 @@
 import json
-from google import genai
-from config import GEMINI_API_KEY
+
+from agents.gemini_client import GeminiClient
+from agents.exceptions import InvalidJSONError
 
 
 class GeminiResumeExtractor:
 
     def __init__(self):
-        self.client = genai.Client(api_key=GEMINI_API_KEY)
+        self.client = GeminiClient()
 
     def extract(self, resume_text):
 
@@ -14,8 +15,6 @@ class GeminiResumeExtractor:
 You are an ATS Resume Expert.
 
 Analyze the following resume.
-
-Extract ONLY the following information.
 
 Return ONLY valid JSON.
 
@@ -27,7 +26,9 @@ Return ONLY valid JSON.
     "databases": [],
     "frameworks": [],
     "projects": [],
-    "experience": []
+    "experience": [],
+    "education": [],
+    "certifications": []
 }}
 
 Resume:
@@ -35,12 +36,9 @@ Resume:
 {resume_text}
 """
 
-        response = self.client.models.generate_content(
-            model="gemini-3.5-flash-lite",
-            contents=prompt
-        )
+        text = self.client.generate(prompt)
 
-        text = response.text.strip()
+        text = text.strip()
 
         if text.startswith("```json"):
             text = text.replace("```json", "", 1)
@@ -53,4 +51,10 @@ Resume:
 
         text = text.strip()
 
-        return json.loads(text)
+        try:
+            return json.loads(text)
+
+        except json.JSONDecodeError:
+            raise InvalidJSONError(
+                "Gemini returned invalid JSON while analyzing the resume."
+            )

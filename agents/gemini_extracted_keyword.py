@@ -1,12 +1,13 @@
 import json
-from google import genai
-from config import GEMINI_API_KEY
+
+from agents.gemini_client import GeminiClient
+from agents.exceptions import InvalidJSONError
 
 
 class GeminiKeywordExtractor:
 
     def __init__(self):
-        self.client = genai.Client(api_key=GEMINI_API_KEY)
+        self.client = GeminiClient()
 
     def extract(self, job_description):
 
@@ -36,12 +37,9 @@ Job Description:
 {job_description}
 """
 
-        response = self.client.models.generate_content(
-            model="gemini-flash-latest",
-            contents=prompt
-        )
+        text = self.client.generate(prompt)
 
-        text = response.text.strip()
+        text = text.strip()
 
         if text.startswith("```json"):
             text = text.replace("```json", "", 1)
@@ -54,4 +52,10 @@ Job Description:
 
         text = text.strip()
 
-        return json.loads(text)
+        try:
+            return json.loads(text)
+
+        except json.JSONDecodeError:
+            raise InvalidJSONError(
+                "Gemini returned invalid JSON while analyzing the Job Description."
+            )

@@ -1,7 +1,5 @@
-openai
+google-genai
 python-docx
-pdfplumber
-docx2pdf
 python-dotenv
-streamlit
-PyMuPDF
+pdfplumber
+reportlab

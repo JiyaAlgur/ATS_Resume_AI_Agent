@@ -11,5 +11,11 @@ __pycache__/
 # Generated output
 outputs/
 
-# VS Code settings (optional)
+# Log files
+logs/
+
+# VS Code settings
 .vscode/
+
+# macOS
+.DS_Store

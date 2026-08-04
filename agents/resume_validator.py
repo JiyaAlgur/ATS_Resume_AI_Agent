@@ -4,10 +4,12 @@ class ResumeValidator:
 
         report = {}
 
+        # Summary is a string
         report["Professional Summary"] = bool(
             resume_data.get("summary", "").strip()
         )
 
+        # These are lists
         report["Technical Skills"] = bool(
             resume_data.get("skills", [])
         )
@@ -17,7 +19,7 @@ class ResumeValidator:
         )
 
         report["Education"] = bool(
-            resume_data.get("education", "").strip()
+            resume_data.get("education", [])
         )
 
         report["Certifications"] = bool(
